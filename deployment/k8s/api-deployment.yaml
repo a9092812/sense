@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sense-api
+  labels:
+    app: sense-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sense-api
+  template:
+    metadata:
+      labels:
+        app: sense-api
+    spec:
+      containers:
+      - name: api
+        image: sense-api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_HOST
+          value: "postgres-service"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: KAFKA_BROKERS
+          value: "kafka-service:9092"
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sense-api-service
+spec:
+  selector:
+    app: sense-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer

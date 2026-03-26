@@ -1,0 +1,12 @@
+{
+  "deviceId": "test-device-001",
+  "deviceAddress": "AA:BB:CC:DD:EE:FF",
+  "rssi": -65,
+  "rawAdvertisement": "0x0102030405",
+  "parsedType": "SHT40",
+  "parsedData": {
+    "temperature": 25.5,
+    "humidity": 60.2
+  },
+  "timestamp": 1710650000
+}
