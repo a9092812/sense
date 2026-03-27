@@ -11,4 +11,5 @@ const (
 	SensorAmmonia       SensorType = "AmmoniaSensor"
 	SensorTempLogger    SensorType = "TempLogger"
 	SensorDataLogger    SensorType = "DataLogger"
+	SensorSen6x         SensorType = "SEN6x"
 )

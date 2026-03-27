@@ -25,6 +25,7 @@ type BatchAggregator struct {
 	ammoniaBatch    []models.AmmoniaSensorData
 	tempLoggerBatch []models.TempLoggerData
 	dataLoggerBatch []models.DataLoggerData
+	sen6xBatch      []models.Sen6xData
 
 	mutex sync.Mutex
 }
@@ -159,6 +160,24 @@ func (a *BatchAggregator) Add(packet *models.SensorPacketMessage) {
 		if len(a.dataLoggerBatch) >= batchSize {
 			a.flushDataLogger()
 		}
+	case "SEN6x":
+		data := models.Sen6xData{
+			DeviceID:    packet.DeviceID,
+			Time:        packet.GetTime(),
+			PM1:         packet.Float("pm1"),
+			PM25:        packet.Float("pm25"),
+			PM40:        packet.Float("pm4"),
+			PM100:       packet.Float("pm10"),
+			Temperature: packet.Float("temperature"),
+			Humidity:    packet.Float("humidity"),
+			CO2:         packet.Float("co2"),
+			VOC:         packet.Float("voc"),
+			NOx:         packet.Float("nox"),
+		}
+		a.sen6xBatch = append(a.sen6xBatch, data)
+		if len(a.sen6xBatch) >= batchSize {
+			a.flushSen6x()
+		}
 	}
 }
 
@@ -178,6 +197,7 @@ func (a *BatchAggregator) flushLoop() {
 		a.flushAmmonia()
 		a.flushTempLogger()
 		a.flushDataLogger()
+		a.flushSen6x()
 
 		a.mutex.Unlock()
 	}
@@ -263,4 +283,14 @@ func (a *BatchAggregator) flushDataLogger() {
 		logger.Error("Failed to flush DataLogger batch", zap.Error(err))
 	}
 	a.dataLoggerBatch = nil
+}
+
+func (a *BatchAggregator) flushSen6x() {
+	if len(a.sen6xBatch) == 0 {
+		return
+	}
+	if err := a.repos.Sen6x.CreateBatch(a.sen6xBatch); err != nil {
+		logger.Error("Failed to flush SEN6x batch", zap.Error(err))
+	}
+	a.sen6xBatch = nil
 }

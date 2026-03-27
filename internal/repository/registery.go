@@ -14,6 +14,7 @@ type Registry struct {
 	TempLogger        *TempLoggerRepository
 	DataLogger        *DataLoggerRepository
 	DeviceLatestState *DeviceLatestStateRepository
+	Sen6x             *Sen6xRepository
 }
 
 func NewRegistry(db *gorm.DB) *Registry {
@@ -30,5 +31,6 @@ func NewRegistry(db *gorm.DB) *Registry {
 		TempLogger:        NewTempLoggerRepository(db),
 		DataLogger:        NewDataLoggerRepository(db),
 		DeviceLatestState: NewDeviceLatestStateRepository(db),
+		Sen6x:             NewSen6xRepository(db),
 	}
 }

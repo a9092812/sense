@@ -1,0 +1,1 @@
+ALTER TYPE sensor_type ADD VALUE IF NOT EXISTS 'SEN6x';
